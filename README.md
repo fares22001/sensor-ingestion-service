@@ -203,7 +203,3 @@ At that volume, a single instance writing directly to SQLite becomes the bottlen
                   Scalable Database
 
 **4. Add data retention and aggregation.** At 864 million readings a day, keeping every raw reading forever isn't realistic. I'd keep recent raw data for detailed analysis, aggregate older data into hourly or daily statistics, and archive or drop data past a defined retention window.
-
-**5. Add monitoring and reliability.** At production scale, I'd want visibility into API request rates, failed requests, Kafka consumer lag, database performance, processing latency, and general application health - so bottlenecks and failures get caught before they cascade.
-
-The overall goal is to make each layer - API, message processing, and database - scale independently, so the system isn't tied to a single FastAPI instance and a local SQLite file the way this assignment's implementation currently is.
