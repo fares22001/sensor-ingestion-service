@@ -174,13 +174,13 @@ The current setup - a single FastAPI instance with SQLite - works well for the s
 - 36 million readings/hour
 - 864 million readings/day
 
-At that volume, a single instance writing directly to SQLite becomes the bottleneck fast. Here's how I'd approach scaling it, by separating ingestion, processing, and storage into independent layers.
+At that volume, a single instance writing directly to SQLite becomes the bottleneck. Here's how I'd approach scaling it, by separating ingestion, processing, and storage into independent layers.
 
 **1. Scale the FastAPI layer.** Since the app is stateless, it can run as multiple instances behind a load balancer, and more instances can be added as traffic grows.
 
 **2. Introduce a message broker.** Rather than every request hitting the database directly, FastAPI would validate the reading and publish it to something like Apache Kafka. Separate worker processes would then consume from Kafka and write to the database. This decouples ingestion from storage - if the database temporarily can't keep up, messages simply queue in Kafka until the consumers catch up, and multiple consumers can process in parallel.
 
-**3. Replace SQLite with a database built for this.** Something like PostgreSQL with TimescaleDB, or another time-series-oriented database, with indexing on `sensor_id` and `timestamp`, time-based partitioning, sensible retention policies, and replication for availability. The exact choice would depend on expected query patterns and operational needs.
+**3. Replace SQLite with a database built for this.** Something like PostgreSQL with TimescaleDB, or another time-series-oriented database, with indexing on `sensor_id` and `timestamp`, time-based partitioning, and replication for availability. The exact choice would depend on expected query patterns and operational needs.
 
                          Sensors
                             |
