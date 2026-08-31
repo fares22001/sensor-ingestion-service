@@ -121,13 +121,13 @@ Returns `404 Not Found` if the reading doesn't exist.
 
 ## Validation and Error Handling
 
-Every request is validated before anything touches the database:
+Pydantic is used to validate every incoming request before the data reaches the database.
 
 - `sensor_id` must be present and non-empty
 - `timestamp` must be a valid ISO 8601 datetime
 - `reading` must be a valid number
 
-Database errors are handled gracefully, with failed transactions rolled back to avoid leaving partial writes behind.
+Database errors are handled, with failed transactions rolled back to avoid leaving partial writes behind.
 
 **Duplicate readings:** a unique constraint on `sensor_id` + `timestamp` prevents the same sensor from storing two readings at the same moment. Submitting a duplicate returns `409 Conflict`, which protects against accidentally storing the same measurement twice.
 
@@ -162,7 +162,7 @@ The tests cover the core behavior: successful reading creation, input validation
 - `reading` is left as a generic measurement, since the assignment doesn't specify a unit.
 - SQLite is sufficient for this scope - no need for anything heavier.
 - Authentication and authorization are out of scope.
-- The service trusts that the external source provides a valid sensor ID.
+- The service validates that a `sensor_id` is provided, but does not maintain a separate sensor registry or verify that the sensor exists.
 - This is a simple ingestion service, not intended to include message processing or analytics.
 
 ## Scaling This Further
